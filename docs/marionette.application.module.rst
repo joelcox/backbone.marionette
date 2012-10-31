@@ -9,40 +9,21 @@ multiple files.
 Marionette's module allow you to have unlimited sub-modules hanging off
 your application, and serve as an event aggregator in themselves.
 
-Documentation Index
--------------------
-
--  `Basic Usage <#basic-usage>`_
--  `Starting And Stopping Modules <#starting-and-stopping-modules>`_
--  `Starting Modules <#starting-modules>`_
--  `Preventing Auto-Start Of
-   Modules <#preventing-auto-start-of-modules>`_
--  `Starting Sub-Modules With
-   Parent <#starting-sub-modules-with-parent>`_
--  `Stopping Modules <#stopping-modules>`_
--  `Defining Sub-Modules With .
-   Notation <#defining-sub-modules-with--notation>`_
--  `Module Definitions <#module-definitions>`_
--  `Module Initializers <#module-initializers>`_
--  `Module Finalizers <#module-finalizers>`_
--  `The Module's ``this`` Argument <#the-modules-this-argument>`_
--  `Custom Arguments <#custom-arguments>`_
--  `Splitting A Module Definition
-   Apart <#splitting-a-module-definition-apart>`_
-
 Basic Usage
 -----------
 
 A module is defined directly from an Application object as the specified
 name:
 
-\`\`\`js var MyApp = new Backbone.Marionette.Application();
+::
 
-var myModule = MyApp.module("MyModule");
+    var MyApp = new Backbone.Marionette.Application();
 
-MyApp.MyModule; // => a new Marionette.Application object
+    var myModule = MyApp.module("MyModule");
 
-myModule === MyApp.MyModule; // => true \`\`\`
+    MyApp.MyModule; // => a new Marionette.Application object
+
+    myModule === MyApp.MyModule; // => true
 
 If you specify the same module name more than once, the first instance
 of the module will be retained and a new instance will not be created.
@@ -68,15 +49,17 @@ Starting a module is done in one of two ways:
 In this example, the module will be started automatically with the
 parent application object's ``start`` call:
 
-\`\`\`js MyApp = new Backbone.Marionette.Application();
+::
 
-MyApp.module("Foo", function(){
+    MyApp = new Backbone.Marionette.Application();
 
-// module code goes here
+    MyApp.module("Foo", function(){
 
-});
+        // module code goes here
 
-MyApp.start(); \`\`\`
+    });
+
+    MyApp.start();
 
 Note that modules loaded and defined after the ``app.start()`` call will
 still be started automatically.
@@ -88,13 +71,14 @@ If you wish to manually start a module instead of having the application
 start it, you can tell the module definition not to start with the
 parent:
 
-\`\`\`js var fooModule = MyApp.module("Foo", { startWithParent: false,
+::
 
-define: function(){ // module code goes here } });
+    var fooModule = MyApp.module("Foo", { startWithParent: false, define:
+        function(){ // module code goes here } });
 
-// start the app without starting the module MyApp.start();
+    // start the app without starting the module MyApp.start();
 
-// later, start the module fooModule.start(); \`\`\`
+    // later, start the module fooModule.start();
 
 Note the use of an object literal instead of just a function to define
 the module, and the presence of the ``startWithParent`` attribute, to
@@ -104,11 +88,14 @@ module's ``start`` method is manually called.
 You can also grab a reference to the module at a later point in time, to
 start it:
 
-\`\`\`js MyApp.module("Foo", { startWithParent: false, define:
-function(){ /*...*/ } });
+::
 
-// start the module by getting a reference to it first
-MyApp.module("Foo").start(); \`\`\`
+    MyApp.module("Foo", { startWithParent: false, define: function(){
+        /*...*/ }
+    });
+
+    // start the module by getting a reference to it first
+    MyApp.module("Foo").start();
 
 Starting Sub-Modules With Parent
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,10 +106,12 @@ That is, a hierarchy of ``Foo.Bar.Baz`` will start ``Baz`` first, then
 
 Submodules default to starting with their parent module.
 
-\`\`\`js MyApp.module("Foo", function(){...}); MyApp.module("Foo.Bar",
-function(){...});
+::
 
-MyApp.start(); \`\`\`
+    MyApp.module("Foo", function(){...}); MyApp.module("Foo.Bar",
+    function(){...});
+
+    MyApp.start();
 
 In this example, the "Foo.Bar" module will be started with the call to
 ``MyApp.start()`` because the parent module, "Foo" is set to start with
@@ -132,19 +121,22 @@ A sub-module can override this behavior by setting it's
 ``startWithParent`` to false. This prevents it from being started by the
 parent's ``start`` call.
 
-\`\`\`js MyApp.module("Foo", define: function(){...});
+::
 
-MyApp.module("Foo.Bar", { startWithParent: true, define: function(){...}
-})
+    MyApp.module("Foo", define: function(){...});
 
-MyApp.start(); \`\`\`
+    MyApp.module("Foo.Bar", { startWithParent: true, define: function(){...}});
+
+    MyApp.start();
 
 Now the module "Foo" will be started, but the sub-module "Foo.Bar" will
 not be started.
 
 A sub-module can still be started manually, with this configuration:
 
-``js MyApp.module("Foo.Bar").start();``
+::
+
+    MyApp.module("Foo.Bar").start();
 
 Stopping Modules
 ~~~~~~~~~~~~~~~~
@@ -158,15 +150,19 @@ finally ``Foo``.
 To stop a module and it's children, call the ``stop()`` method of a
 module.
 
-``js MyApp.module("Foo").stop();``
+::
+
+    MyApp.module("Foo").stop();
 
 Modules are not automatically stopped by the application. If you wish to
 stop one, you must call the ``stop`` method on it. The exception to this
 is that stopping a parent module will stop all of it's sub-modules.
 
-\`\`\`js MyApp.module("Foo.Bar.Baz");
+::
 
-MyApp.module("Foo").stop(); \`\`\`
+    MyApp.module("Foo.Bar.Baz");
+
+    MyApp.module("Foo").stop();
 
 This call to ``stop`` causes the ``Bar`` and ``Baz`` modules to both be
 stopped as they are sub-modules of ``Foo``. For more information on
@@ -179,11 +175,13 @@ Defining Sub-Modules With . Notation
 Sub-modules or child modules can be defined as a hierarchy of modules
 and sub-modules all at once:
 
-\`\`\`js MyApp.module("Parent.Child.GrandChild");
+::
 
-MyApp.Parent; // => a valid module object MyApp.Parent.Child; // => a
-valid module object MyApp.Parent.Child.GrandChild; // => a valid module
-object \`\`\`
+    MyApp.module("Parent.Child.GrandChild");
+
+    MyApp.Parent; // => a valid module object MyApp.Parent.Child; // => a
+    valid module object MyApp.Parent.Child.GrandChild; // => a valid module
+    object
 
 When defining sub-modules using the dot-notation, the parent modules do
 not need to exist. They will be created for you if they don't exist. If
@@ -212,24 +210,26 @@ You can add functions and data directly to your module to make them
 publicly accessible. You can also add private functions and data by
 using locally scoped variables.
 
-\`\`\`js MyApp.module("MyModule", function(MyModule, MyApp, Backbone,
-Marionette, $, \_){
+::
 
-// Private Data And Functions // --------------------------
+    MyApp.module("MyModule", function(MyModule, MyApp, Backbone, Marionette,
+        $, \_){
 
-var myData = "this is private data";
+        // Private Data And Functions // --------------------------
 
-var myFunction = function(){ console.log(myData); }
+        var myData = "this is private data";
 
-// Public Data And Functions // -------------------------
+        var myFunction = function(){ console.log(myData); }
 
-MyModule.someData = "public data";
+        // Public Data And Functions // -------------------------
 
-MyModule.someFunction = function(){ console.log(MyModule.someData); }
-});
+        MyModule.someData = "public data";
 
-console.log(MyApp.MyModule.someData); //=> public data
-MyApp.MyModule.someFunction(); //=> public data \`\`\`
+        MyModule.someFunction = function(){ console.log(MyModule.someData); }
+    });
+
+    console.log(MyApp.MyModule.someData); //=> public data
+    MyApp.MyModule.someFunction(); //=> public data
 
 Module Initializers
 ~~~~~~~~~~~~~~~~~~~
@@ -237,12 +237,15 @@ Module Initializers
 Modules have initializers, similarly to ``Application`` objects. A
 module's initializers are run when the module is started.
 
-\`\`\`js MyApp.module("Foo", function(Foo){
+::
 
-Foo.addInitializer(function(){ // initialize and start the module's
-running code, here. });
+    MyApp.module("Foo", function(Foo){
 
-}); \`\`\`
+        Foo.addInitializer(function(){
+            // initialize and start the module's running code, here.
+        });
+
+    });
 
 Any way of starting this module will cause it's initializers to run. You
 can have as many initializers for a module as you wish.
@@ -252,12 +255,15 @@ Module Finalizers
 
 Modules also have finalizers that are run when a module is stopped.
 
-\`\`\`js MyApp.module("Foo", function(Foo){
+::
 
-Foo.addFinalizer(function(){ // tear down, shut down and clean up the
-module, here });
+    MyApp.module("Foo", function(Foo){
 
-}); \`\`\`
+        Foo.addFinalizer(function(){
+            // tear down, shut down and clean up the module, here
+        });
+
+    });
 
 Calling the ``stop`` method on the module will run all that module's
 finalizers. A module can have as many finalizers as you wish.
@@ -267,7 +273,9 @@ The Module's ``this`` Argument
 
 The module's ``this`` argument is set to the module itself.
 
-``js MyApp.module("Foo", function(Foo){   this === Foo; //=> true });``
+::
+
+    MyApp.module("Foo", function(Foo){   this === Foo; //=> true });
 
 Custom Arguments
 ----------------
@@ -277,13 +285,15 @@ module definition function. This will allow you to import 3rd party
 libraries, and other resources that you want to have locally scoped to
 your module.
 
-\`\`\`js MyApp.module("MyModule", function(MyModule, MyApp, Backbone,
-Marionette, $, \_, Lib1, Lib2, LibEtc){
+::
 
-// Lib1 === LibraryNumber1; // Lib2 === LibraryNumber2; // LibEtc ===
-LibraryNumberEtc;
+    MyApp.module("MyModule", function(MyModule, MyApp, Backbone, Marionette, $,
+        \_, Lib1, Lib2, LibEtc){
 
-}, LibraryNumber1, LibraryNumber2, LibraryNumberEtc); \`\`\`
+        // Lib1 === LibraryNumber1; // Lib2 === LibraryNumber2; // LibEtc ===
+        LibraryNumberEtc;
+
+    }, LibraryNumber1, LibraryNumber2, LibraryNumberEtc);
 
 Splitting A Module Definition Apart
 -----------------------------------
@@ -291,11 +301,13 @@ Splitting A Module Definition Apart
 Sometimes a module gets to be too long for a single file. In this case,
 you can split a module definition across multiple files:
 
-\`\`\`js MyApp.module("MyModule", function(MyModule){
-MyModule.definition1 = true; });
+::
 
-MyApp.module("MyModule", function(MyModule){ MyModule.definition2 =
-true; });
+    MyApp.module("MyModule", function(MyModule){
+        MyModule.definition1 = true; });
 
-MyApp.MyModule.definition1; //=> true MyApp.MyModule.definition2; //=>
-true \`\`\`
+    MyApp.module("MyModule", function(MyModule){ MyModule.definition2 =
+    true; });
+
+    MyApp.MyModule.definition1; //=> true MyApp.MyModule.definition2; //=>
+    true
